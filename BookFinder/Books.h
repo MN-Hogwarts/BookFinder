@@ -8,7 +8,7 @@ using namespace std;
 class Books {
 private:
 	string name;
-	Mat image = imread(name);
+	Mat image = imread(name + ".jpg");
 	ifstream details;
 
 public:
