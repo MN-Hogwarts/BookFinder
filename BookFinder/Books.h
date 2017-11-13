@@ -2,8 +2,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "opencv2/core.hpp"
+#include "opencv2/imgproc.hpp"
+
 
 using namespace std;
+using namespace cv;
 
 class Books {
 private:

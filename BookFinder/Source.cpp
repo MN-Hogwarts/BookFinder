@@ -6,6 +6,7 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/calib3d.hpp"
 #include "opencv2/xfeatures2d.hpp"
+#include "Books.h"
 using namespace std;
 using namespace cv;
 using namespace cv::xfeatures2d;
@@ -15,10 +16,14 @@ bool ptsTooClose(Point2f, Point2f);
 
 int main()
 {
+	Books test("Girl on a Plane");
+	test.output();
+	/*
 	bool found = findBook();
 	if (found)
 		cout << "true\n";
 	else cout << "false\n";
+	*/
 	return 0;
 }
 
