@@ -6,18 +6,24 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/calib3d.hpp"
 #include "opencv2/xfeatures2d.hpp"
-#include "Books.h"
+//#include "Books.h"
+#include "Books1.h"
 using namespace std;
 using namespace cv;
 using namespace cv::xfeatures2d;
 
-bool findBook();
+bool findBook(Mat img_object, Mat img_scene);
 bool ptsTooClose(Point2f, Point2f);
 
 int main()
 {
 	Books test("Girl on a Plane");
-	test.output();
+	findBook(test.getImage(), imread("GirlPlaneDiag.jpg"));
+
+	vector<Books> books;
+
+	//imshow("Image", test.getImage());
+	//test.output();
 	/*
 	bool found = findBook();
 	if (found)
@@ -27,10 +33,12 @@ int main()
 	return 0;
 }
 
-bool findBook()
+bool findBook(Mat cover, Mat input)
 {
-	Mat img_object = imread("Homeland.jpg", IMREAD_GRAYSCALE);
-	Mat img_scene = imread("HomelandDiag.jpg", IMREAD_GRAYSCALE);
+	Mat img_object;
+	cvtColor(cover, img_object, CV_RGB2GRAY);
+	Mat img_scene;
+	cvtColor(input, img_scene, CV_RGB2GRAY);
 	if (!img_object.data || !img_scene.data)
 	{
 		cout << " --(!) Error reading images " << endl; return -1;
