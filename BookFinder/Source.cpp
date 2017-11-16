@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <cmath>
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/features2d.hpp"
@@ -11,18 +12,18 @@ using namespace std;
 using namespace cv;
 using namespace cv::xfeatures2d;
 
-bool findBook(Mat img_object, Mat img_scene);
+bool findBook(Mat img_object, Mat img_scene, bool = false);
 bool ptsTooClose(Point2f, Point2f);
 
 int main()
 {
-	Books test("Girl on a Plane");
-	if (findBook(test.getImage(), imread("GirlPlaneDiag.jpg"))) {
-		test.output();
+	Books test("Homeland");
+	if (findBook(test.getImage(), imread("HomelandSide.jpg"), true)) {
+		//test.output();
 	}
 
 	vector<Books> books;
-
+	
 	//imshow("Image", test.getImage());
 	//test.output();
 	/*
@@ -34,11 +35,11 @@ int main()
 	return 0;
 }
 
-bool findBook(Mat cover, Mat input)
+bool findBook(Mat cover, Mat input, bool displayInternal)
 {
 	if (!cover.data || !input.data)
 	{
-		cout << " --(!) Error reading images " << endl; return -1;
+		cout << " --(!) Error reading images " << endl; return 0;
 	}
 	Mat img_object;
 	cvtColor(cover, img_object, CV_RGB2GRAY);
@@ -81,11 +82,6 @@ bool findBook(Mat cover, Mat input)
 			good_matches.push_back(matches[i]);
 		}
 	}
-	Mat img_matches;
-	//drawMatches(img_object, keypoints_object, img_scene, keypoints_scene,
-	drawMatches(img_object, keypoints_object, resized, keypoints_scene,
-		good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-		vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 	//-- Localize the object
 	vector<Point2f> obj;
 	vector<Point2f> scene;
@@ -113,15 +109,26 @@ bool findBook(Mat cover, Mat input)
 			ptsFarEnough = false;
 		}
 	}
-	//-- Draw lines between the corners (the mapped object in the scene - image_2 )
-	line(img_matches, scene_corners[0] + Point2f(img_object.cols, 0), scene_corners[1] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
-	line(img_matches, scene_corners[1] + Point2f(img_object.cols, 0), scene_corners[2] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
-	line(img_matches, scene_corners[2] + Point2f(img_object.cols, 0), scene_corners[3] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
-	line(img_matches, scene_corners[3] + Point2f(img_object.cols, 0), scene_corners[0] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
-	//-- Show detected matches
-	namedWindow("Good Matches & Object detection", WINDOW_AUTOSIZE);
-	imshow("Good Matches & Object detection", img_matches);
-	waitKey(0);
+	if (copysignf(1, scene_corners.at(0).x - scene_corners.at(1).x) != copysignf(1, scene_corners.at(3).x - scene_corners.at(2).x)
+		|| copysignf(1, scene_corners.at(0).y - scene_corners.at(3).y) != copysignf(1, scene_corners.at(1).y - scene_corners.at(2).y)) {
+		ptsFarEnough = false;
+	}
+	if (displayInternal && ptsFarEnough) {
+		Mat img_matches;
+		//drawMatches(img_object, keypoints_object, img_scene, keypoints_scene,
+		drawMatches(img_object, keypoints_object, resized, keypoints_scene,
+			good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
+			vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+		//-- Draw lines between the corners (the mapped object in the scene - image_2 )
+		line(img_matches, scene_corners[0] + Point2f(img_object.cols, 0), scene_corners[1] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
+		line(img_matches, scene_corners[1] + Point2f(img_object.cols, 0), scene_corners[2] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
+		line(img_matches, scene_corners[2] + Point2f(img_object.cols, 0), scene_corners[3] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
+		line(img_matches, scene_corners[3] + Point2f(img_object.cols, 0), scene_corners[0] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
+		//-- Show detected matches
+		namedWindow("Good Matches & Object detection", WINDOW_AUTOSIZE);
+		imshow("Good Matches & Object detection", img_matches);
+		waitKey(0);
+	}
 	return ptsFarEnough;
 }
 
