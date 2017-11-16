@@ -18,8 +18,9 @@ bool ptsTooClose(Point2f, Point2f);
 int main()
 {
 	Books test("Girl on a Plane");
-	if (findBook(test.getImage(), imread("GirlPlaneDiag.jpg")))
-		
+	if (findBook(test.getImage(), imread("GirlPlaneDiag.jpg"))) {
+		test.output();
+	}
 
 	vector<Books> books;
 
@@ -28,7 +29,7 @@ int main()
 	/*
 	bool found = findBook();
 	if (found)
-		cout << "true\n";
+	cout << "true\n";
 	else cout << "false\n";
 	*/
 	return 0;
@@ -104,7 +105,7 @@ bool findBook(Mat cover, Mat input)
 	perspectiveTransform(obj_corners, scene_corners, H);
 	/*
 	for (int i = 0; i < scene_corners.size(); i++) {
-		cout << scene_corners.at(i) << endl;
+	cout << scene_corners.at(i) << endl;
 	}
 	*/
 	bool ptsFarEnough = true;
@@ -129,3 +130,4 @@ bool ptsTooClose(Point2f a, Point2f b)
 {
 	return (abs(a.x - b.x) < 10 && abs(a.y - b.y) < 10);
 }
+
