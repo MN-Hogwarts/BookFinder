@@ -8,6 +8,7 @@
 #include "opencv2/calib3d.hpp"
 #include "opencv2/xfeatures2d.hpp"
 #include "Books.h"
+#include "GUI.h"
 #include "BooksCreator.h"
 using namespace std;
 using namespace cv;
