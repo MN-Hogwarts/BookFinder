@@ -22,8 +22,8 @@ public:
 
 Books::Books(string book_name) {
 	name = book_name;
-	img = imread(name + ".jpg");
-	details = imread(name + "1.jpg");
+	img = imread("Covers\\" + name + ".jpg");
+	details = imread("Details\\" + name + ".jpg");
 }
 
 Mat Books::getImage() {
