@@ -8,6 +8,7 @@
 #include "opencv2/calib3d.hpp"
 #include "opencv2/xfeatures2d.hpp"
 #include "Books.h"
+#include "BooksCreator.h"
 using namespace std;
 using namespace cv;
 using namespace cv::xfeatures2d;
@@ -17,12 +18,21 @@ bool ptsTooClose(Point2f, Point2f);
 
 int main()
 {
+	/*
 	Books test("Homeland");
 	if (findBook(test.getImage(), imread("HomelandSide.jpg"), true)) {
 		//test.output();
 	}
+	*/
+	Mat input = imread("GirlPlane.jpg");
 
-	vector<Books> books;
+	vector<Books> books = objectvec();
+	for (int i = 0; i < books.size(); i++) {
+		if (findBook(books.at(i).getImage(), input)) {
+			books.at(i).output();
+			break;
+		}
+	}
 	
 	//imshow("Image", test.getImage());
 	//test.output();

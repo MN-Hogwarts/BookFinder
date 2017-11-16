@@ -23,5 +23,8 @@
     <ClInclude Include="Books.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BooksCreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
