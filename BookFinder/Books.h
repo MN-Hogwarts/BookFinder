@@ -5,15 +5,14 @@
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
 
-
 using namespace std;
 using namespace cv;
 
 class Books {
 private:
 	string name;
-	Mat image = imread(name + ".jpg");
-	ifstream details;
+	Mat img;
+	Mat details;
 
 public:
 	Books(string);
@@ -23,15 +22,16 @@ public:
 
 Books::Books(string book_name) {
 	name = book_name;
+	img = imread("Covers\\" + name + ".jpg");
+	details = imread("Details\\" + name + ".jpg");
 }
 
 Mat Books::getImage() {
-	return image;
+	return img;
 }
 
 void Books::output() {
-	details.open(name + ".txt");
-	if (details.is_open())
-		cout << details.rdbuf();
+	imshow(name, details);
+	waitKey(0);
 }
 

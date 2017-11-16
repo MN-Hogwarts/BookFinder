@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <iostream>
+#include <cmath>
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/features2d.hpp"
@@ -11,30 +12,39 @@ using namespace std;
 using namespace cv;
 using namespace cv::xfeatures2d;
 
-bool findBook();
+bool findBook(Mat img_object, Mat img_scene, bool = false);
 bool ptsTooClose(Point2f, Point2f);
 
 int main()
 {
-	Books test("Girl on a Plane");
-	test.output();
+	Books test("Homeland");
+	if (findBook(test.getImage(), imread("HomelandSide.jpg"), true)) {
+		//test.output();
+	}
+
+	vector<Books> books;
+	
+	//imshow("Image", test.getImage());
+	//test.output();
 	/*
 	bool found = findBook();
 	if (found)
-		cout << "true\n";
+	cout << "true\n";
 	else cout << "false\n";
 	*/
 	return 0;
 }
 
-bool findBook()
+bool findBook(Mat cover, Mat input, bool displayInternal)
 {
-	Mat img_object = imread("Homeland.jpg", IMREAD_GRAYSCALE);
-	Mat img_scene = imread("HomelandDiag.jpg", IMREAD_GRAYSCALE);
-	if (!img_object.data || !img_scene.data)
+	if (!cover.data || !input.data)
 	{
-		cout << " --(!) Error reading images " << endl; return -1;
+		cout << " --(!) Error reading images " << endl; return 0;
 	}
+	Mat img_object;
+	cvtColor(cover, img_object, CV_RGB2GRAY);
+	Mat img_scene;
+	cvtColor(input, img_scene, CV_RGB2GRAY);
 	Mat resized;
 	Size newSize(img_scene.cols * .3, img_scene.rows * .3);
 	resize(img_scene, resized, newSize);
@@ -72,11 +82,6 @@ bool findBook()
 			good_matches.push_back(matches[i]);
 		}
 	}
-	Mat img_matches;
-	//drawMatches(img_object, keypoints_object, img_scene, keypoints_scene,
-	drawMatches(img_object, keypoints_object, resized, keypoints_scene,
-		good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-		vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 	//-- Localize the object
 	vector<Point2f> obj;
 	vector<Point2f> scene;
@@ -95,7 +100,7 @@ bool findBook()
 	perspectiveTransform(obj_corners, scene_corners, H);
 	/*
 	for (int i = 0; i < scene_corners.size(); i++) {
-		cout << scene_corners.at(i) << endl;
+	cout << scene_corners.at(i) << endl;
 	}
 	*/
 	bool ptsFarEnough = true;
@@ -104,15 +109,26 @@ bool findBook()
 			ptsFarEnough = false;
 		}
 	}
-	//-- Draw lines between the corners (the mapped object in the scene - image_2 )
-	line(img_matches, scene_corners[0] + Point2f(img_object.cols, 0), scene_corners[1] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
-	line(img_matches, scene_corners[1] + Point2f(img_object.cols, 0), scene_corners[2] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
-	line(img_matches, scene_corners[2] + Point2f(img_object.cols, 0), scene_corners[3] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
-	line(img_matches, scene_corners[3] + Point2f(img_object.cols, 0), scene_corners[0] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
-	//-- Show detected matches
-	namedWindow("Good Matches & Object detection", WINDOW_AUTOSIZE);
-	imshow("Good Matches & Object detection", img_matches);
-	waitKey(0);
+	if (copysignf(1, scene_corners.at(0).x - scene_corners.at(1).x) != copysignf(1, scene_corners.at(3).x - scene_corners.at(2).x)
+		|| copysignf(1, scene_corners.at(0).y - scene_corners.at(3).y) != copysignf(1, scene_corners.at(1).y - scene_corners.at(2).y)) {
+		ptsFarEnough = false;
+	}
+	if (displayInternal && ptsFarEnough) {
+		Mat img_matches;
+		//drawMatches(img_object, keypoints_object, img_scene, keypoints_scene,
+		drawMatches(img_object, keypoints_object, resized, keypoints_scene,
+			good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
+			vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
+		//-- Draw lines between the corners (the mapped object in the scene - image_2 )
+		line(img_matches, scene_corners[0] + Point2f(img_object.cols, 0), scene_corners[1] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
+		line(img_matches, scene_corners[1] + Point2f(img_object.cols, 0), scene_corners[2] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
+		line(img_matches, scene_corners[2] + Point2f(img_object.cols, 0), scene_corners[3] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
+		line(img_matches, scene_corners[3] + Point2f(img_object.cols, 0), scene_corners[0] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
+		//-- Show detected matches
+		namedWindow("Good Matches & Object detection", WINDOW_AUTOSIZE);
+		imshow("Good Matches & Object detection", img_matches);
+		waitKey(0);
+	}
 	return ptsFarEnough;
 }
 
@@ -120,3 +136,4 @@ bool ptsTooClose(Point2f a, Point2f b)
 {
 	return (abs(a.x - b.x) < 10 && abs(a.y - b.y) < 10);
 }
+
