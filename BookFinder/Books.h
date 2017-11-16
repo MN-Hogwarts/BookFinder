@@ -6,32 +6,32 @@
 #include "opencv2/imgproc.hpp"
 
 using namespace std;
-using namespace cv;
+//using namespace cv;
 
 class Books {
 private:
 	string name;
-	Mat img;
-	Mat details;
+	cv::Mat img;
+	cv::Mat details;
 
 public:
 	Books(string);
-	Mat getImage();
+	cv::Mat getImage();
 	void output();
 };
 
 Books::Books(string book_name) {
 	name = book_name;
-	img = imread("Covers\\" + name + ".jpg");
-	details = imread("Details\\" + name + ".jpg");
+	img = cv::imread("Covers\\" + name + ".jpg");
+	details = cv::imread("Details\\" + name + ".jpg");
 }
 
-Mat Books::getImage() {
+cv::Mat Books::getImage() {
 	return img;
 }
 
 void Books::output() {
-	imshow(name, details);
-	waitKey(0);
+	cv::imshow(name, details);
+	cv::waitKey(0);
 }
 
