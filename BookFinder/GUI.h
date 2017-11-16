@@ -35,7 +35,7 @@ PWSTR openFileDialog() {
 				// Notice that this is a 1-based array.
 				COMDLG_FILTERSPEC rgSpec[] =
 				{
-					{ L"Text Files", L"*.txt" },
+					//{ L"Text Files", L"*.txt" },
 					{ L"All Files", L"*.*" },
 				};
 				hr = pFileOpen->SetFileTypes(ARRAYSIZE(rgSpec), rgSpec);
@@ -44,7 +44,7 @@ PWSTR openFileDialog() {
 
 					// Set the default extension to be ".txt" file.
 					pFileOpen->SetTitle(L"Open file...");
-					hr = pFileOpen->SetDefaultExtension(L"txt");
+					hr = pFileOpen->SetDefaultExtension(L"*.*");
 					if (SUCCEEDED(hr))
 					{
 						// Show the Open dialog box.
@@ -122,6 +122,7 @@ string input() {
 	instructions = cv::imread("Instructions.jpg");
 	cv::imshow("Instructions", instructions);
 	cv::waitKey(0);
+	cv::destroyWindow("Instructions");
 	string name = check();
 	do {
 		if (name != "ERROR")
