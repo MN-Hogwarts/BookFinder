@@ -36,14 +36,14 @@ int main()
 
 bool findBook(Mat cover, Mat input)
 {
+	if (!cover.data || !input.data)
+	{
+		cout << " --(!) Error reading images " << endl; return -1;
+	}
 	Mat img_object;
 	cvtColor(cover, img_object, CV_RGB2GRAY);
 	Mat img_scene;
 	cvtColor(input, img_scene, CV_RGB2GRAY);
-	if (!img_object.data || !img_scene.data)
-	{
-		cout << " --(!) Error reading images " << endl; return -1;
-	}
 	Mat resized;
 	Size newSize(img_scene.cols * .3, img_scene.rows * .3);
 	resize(img_scene, resized, newSize);
