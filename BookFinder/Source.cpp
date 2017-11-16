@@ -18,7 +18,8 @@ bool ptsTooClose(Point2f, Point2f);
 int main()
 {
 	Books test("Girl on a Plane");
-	findBook(test.getImage(), imread("GirlPlaneDiag.jpg"));
+	if (findBook(test.getImage(), imread("GirlPlaneDiag.jpg")))
+		
 
 	vector<Books> books;
 
