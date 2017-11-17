@@ -154,6 +154,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Books.h" />
+    <ClInclude Include="BooksCreator.h" />
+    <ClInclude Include="GUI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

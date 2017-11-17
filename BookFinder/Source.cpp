@@ -8,21 +8,35 @@
 #include "opencv2/calib3d.hpp"
 #include "opencv2/xfeatures2d.hpp"
 #include "Books.h"
+#include "GUI.h"
+#include "BooksCreator.h"
 using namespace std;
 using namespace cv;
 using namespace cv::xfeatures2d;
 
-bool findBook(Mat img_object, Mat img_scene, bool = false);
+bool findBook(Books, Matchable, bool = false);
 bool ptsTooClose(Point2f, Point2f);
 
 int main()
 {
+	/*
 	Books test("Homeland");
 	if (findBook(test.getImage(), imread("HomelandSide.jpg"), true)) {
 		//test.output();
 	}
+	*/
+	//Mat input = imread("GirlPlane.jpg");
+	string filename = input();
+	Matchable input(imread(filename));
 
-	vector<Books> books;
+	vector<Books> books = objectvec();
+	cout << "Books created\n";
+	for (int i = 0; i < books.size(); i++) {
+		if (findBook(books.at(i), input)) {
+			books.at(i).output();
+			break;
+		}
+	}
 	
 	//imshow("Image", test.getImage());
 	//test.output();
@@ -35,28 +49,34 @@ int main()
 	return 0;
 }
 
-bool findBook(Mat cover, Mat input, bool displayInternal)
+bool findBook(Books cover, Matchable input, bool displayInternal)
 {
-	if (!cover.data || !input.data)
+	if (!cover.getImage().data || !input.getImage().data)
 	{
 		cout << " --(!) Error reading images " << endl; return 0;
 	}
 	Mat img_object;
-	cvtColor(cover, img_object, CV_RGB2GRAY);
+	cvtColor(cover.getImage(), img_object, CV_RGB2GRAY);
 	Mat img_scene;
-	cvtColor(input, img_scene, CV_RGB2GRAY);
+	cvtColor(input.getImage(), img_scene, CV_RGB2GRAY);
+	/*
 	Mat resized;
 	Size newSize(img_scene.cols * .3, img_scene.rows * .3);
 	resize(img_scene, resized, newSize);
+	*/
 	//imshow("Resized scene", resized);
 	//-- Step 1: Detect the keypoints and extract descriptors using SURF
-	int minHessian = 400;
-	Ptr<SURF> detector = SURF::create(minHessian);
-	vector<KeyPoint> keypoints_object, keypoints_scene;
-	Mat descriptors_object, descriptors_scene;
+	//int minHessian = 400;
+	//Ptr<SURF> detector = SURF::create(minHessian);
+	vector<KeyPoint> keypoints_object = cover.keypoints;
+	vector<KeyPoint> keypoints_scene = input.keypoints;
+	Mat descriptors_object = cover.descriptors;
+	Mat descriptors_scene = input.descriptors;
+	/*
 	detector->detectAndCompute(img_object, Mat(), keypoints_object, descriptors_object);
 	//detector->detectAndCompute(img_scene, Mat(), keypoints_scene, descriptors_scene);
 	detector->detectAndCompute(resized, Mat(), keypoints_scene, descriptors_scene);
+	*/
 	//-- Step 2: Matching descriptor vectors using FLANN matcher
 	FlannBasedMatcher matcher;
 	vector< DMatch > matches;
@@ -115,8 +135,8 @@ bool findBook(Mat cover, Mat input, bool displayInternal)
 	}
 	if (displayInternal && ptsFarEnough) {
 		Mat img_matches;
-		//drawMatches(img_object, keypoints_object, img_scene, keypoints_scene,
-		drawMatches(img_object, keypoints_object, resized, keypoints_scene,
+		drawMatches(img_object, keypoints_object, img_scene, keypoints_scene,
+		//drawMatches(img_object, keypoints_object, resized, keypoints_scene,
 			good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
 			vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
 		//-- Draw lines between the corners (the mapped object in the scene - image_2 )
