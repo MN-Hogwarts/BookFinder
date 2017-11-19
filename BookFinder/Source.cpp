@@ -17,16 +17,10 @@ using namespace cv::xfeatures2d;
 
 bool findBook(Books, Matchable, bool = false);
 bool ptsTooClose(Point2f, Point2f);
+bool checkConvex(vector<Point2f>);
 
 int main()
 {
-	/*
-	Books test("Homeland");
-	if (findBook(test.getImage(), imread("HomelandSide.jpg"), true)) {
-		//test.output();
-	}
-	*/
-	//Mat input = imread("GirlPlane.jpg");
 	vector<Books> books = objectvec();
 	cout << "Books created\n";
 
@@ -42,9 +36,7 @@ int main()
 		}
 		destroyAllWindows();
 	}
-	
-	//imshow("Image", test.getImage());
-	//test.output();
+
 	/*
 	bool found = findBook();
 	if (found)
@@ -128,18 +120,20 @@ bool findBook(Books cover, Matchable input, bool displayInternal)
 	cout << scene_corners.at(i) << endl;
 	}
 	*/
-	bool ptsFarEnough = true;
-	for (int i = 1; i < scene_corners.size(); i++) {
-		if (ptsTooClose(scene_corners.at(i), scene_corners.at(i - 1))) {
-			ptsFarEnough = false;
+	bool validShape = true;
+	for (int i = 0; i < scene_corners.size(); i++) {
+		if (ptsTooClose(scene_corners.at((i + 1) % 4), scene_corners.at(i % 4))) {
+			validShape = false;
 		}
 	}
-	if (ptsTooClose(scene_corners.at(0), scene_corners.at(scene_corners.size() - 1)))
 	if (copysignf(1, scene_corners.at(0).x - scene_corners.at(1).x) != copysignf(1, scene_corners.at(3).x - scene_corners.at(2).x)
 		|| copysignf(1, scene_corners.at(0).y - scene_corners.at(3).y) != copysignf(1, scene_corners.at(1).y - scene_corners.at(2).y)) {
-		ptsFarEnough = false;
+		validShape = false;
 	}
-	if (displayInternal && ptsFarEnough) {
+	if (!checkConvex(scene_corners)) {
+		validShape = false;
+	}
+	if (displayInternal && validShape) {
 		Mat img_matches;
 		drawMatches(img_object, keypoints_object, img_scene, keypoints_scene,
 		//drawMatches(img_object, keypoints_object, resized, keypoints_scene,
@@ -155,7 +149,7 @@ bool findBook(Books cover, Matchable input, bool displayInternal)
 		imshow("Good Matches & Object detection", img_matches);
 		waitKey(0);
 	}
-	return ptsFarEnough;
+	return validShape;
 }
 
 bool ptsTooClose(Point2f a, Point2f b)
@@ -163,3 +157,22 @@ bool ptsTooClose(Point2f a, Point2f b)
 	return (abs(a.x - b.x) < 30 && abs(a.y - b.y) < 30);
 }
 
+bool checkConvex(vector<Point2f> corners) {
+	// vector size must be 4
+	bool convex = true;
+	for (int i = 0; i < 2; i++) {
+		// finds coordinates of median of diagonals
+		float medx = (corners.at(i).x + corners.at(i + 2).x) / 2;
+		float medy = (corners.at(i).y + corners.at(i + 2).y) / 2;
+		if (copysignf(1, medx - corners.at(i + 1).x) == copysignf(1, medx - corners.at((i + 3) % 4).x) // checks if x-velues are on same side of median
+			&& copysignf(1, corners.at(i).y - corners.at(i + 1).y) == copysignf(1, corners.at(i).y - corners.at((i + 3) % 4).y) // checks if y-values are on same side of points
+			&& copysignf(1, corners.at(i + 2).y - corners.at(i + 1).y) == copysignf(1, corners.at(i + 2).y - corners.at((i + 3) % 4).y)
+			|| copysignf(1, medy - corners.at(i + 1).y) == copysignf(1, medy - corners.at((i + 3) % 4).y) // checks if y-velues are on same side of median
+			&& copysignf(1, corners.at(i).x - corners.at(i + 1).x) == copysignf(1, corners.at(i).x - corners.at((i + 3) % 4).x) // checks if x-values are on same side of points
+			&& copysignf(1, corners.at(i + 2).x - corners.at(i + 1).x) == copysignf(1, corners.at(i + 2).x - corners.at((i + 3) % 4).x)) {
+
+			convex = false;
+		}
+	}
+	return convex;
+}
