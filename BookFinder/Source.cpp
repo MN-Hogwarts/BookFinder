@@ -10,6 +10,7 @@
 #include "Books.h"
 #include "GUI.h"
 #include "BooksCreator.h"
+
 using namespace std;
 using namespace cv;
 using namespace cv::xfeatures2d;
@@ -26,16 +27,20 @@ int main()
 	}
 	*/
 	//Mat input = imread("GirlPlane.jpg");
-	string filename = input();
-	Matchable input(imread(filename));
-
 	vector<Books> books = objectvec();
 	cout << "Books created\n";
-	for (int i = 0; i < books.size(); i++) {
-		if (findBook(books.at(i), input)) {
-			books.at(i).output();
-			break;
+
+	while (1) {
+		string filename = input();
+		Matchable input(imread(filename));
+
+		for (int i = 0; i < books.size(); i++) {
+			if (findBook(books.at(i), input, true)) {
+				books.at(i).output();
+				break;
+			}
 		}
+		destroyAllWindows();
 	}
 	
 	//imshow("Image", test.getImage());
@@ -129,6 +134,7 @@ bool findBook(Books cover, Matchable input, bool displayInternal)
 			ptsFarEnough = false;
 		}
 	}
+	if (ptsTooClose(scene_corners.at(0), scene_corners.at(scene_corners.size() - 1)))
 	if (copysignf(1, scene_corners.at(0).x - scene_corners.at(1).x) != copysignf(1, scene_corners.at(3).x - scene_corners.at(2).x)
 		|| copysignf(1, scene_corners.at(0).y - scene_corners.at(3).y) != copysignf(1, scene_corners.at(1).y - scene_corners.at(2).y)) {
 		ptsFarEnough = false;
@@ -154,6 +160,6 @@ bool findBook(Books cover, Matchable input, bool displayInternal)
 
 bool ptsTooClose(Point2f a, Point2f b)
 {
-	return (abs(a.x - b.x) < 10 && abs(a.y - b.y) < 10);
+	return (abs(a.x - b.x) < 30 && abs(a.y - b.y) < 30);
 }
 
