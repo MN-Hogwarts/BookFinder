@@ -21,19 +21,34 @@ bool checkConvex(vector<Point2f>);
 
 int main()
 {
+	imshow("Startup Page", imread("BookOutputs//StartUpPages.jpg"));
+	waitKey(500);
 	vector<Books> books = objectvec();
-	cout << "Books created\n";
+	destroyWindow("Startup Page");
 
 	while (1) {
 		string filename = input();
 		Matchable input(imread(filename));
 
+		//imshow("Resized", input.getImage());
+
+		bool found = false;
+		imshow("Searching", imread("BookOutputs//SearchingPage.jpg"));
+		waitKey(500);
+		///*
 		for (int i = 0; i < books.size(); i++) {
 			if (findBook(books.at(i), input, true)) {
+				destroyWindow("Searching");
 				books.at(i).output();
+				found = true;
 				break;
 			}
 		}
+		if (!found) {
+			imshow("Startup Page", imread("BookOutputs//NotFoundPage.jpg"));
+			waitKey(0);
+		}
+		//*/
 		destroyAllWindows();
 	}
 
@@ -126,10 +141,12 @@ bool findBook(Books cover, Matchable input, bool displayInternal)
 			validShape = false;
 		}
 	}
+	/*
 	if (copysignf(1, scene_corners.at(0).x - scene_corners.at(1).x) != copysignf(1, scene_corners.at(3).x - scene_corners.at(2).x)
 		|| copysignf(1, scene_corners.at(0).y - scene_corners.at(3).y) != copysignf(1, scene_corners.at(1).y - scene_corners.at(2).y)) {
 		validShape = false;
 	}
+	*/
 	if (!checkConvex(scene_corners)) {
 		validShape = false;
 	}
