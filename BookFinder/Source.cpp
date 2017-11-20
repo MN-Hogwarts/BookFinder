@@ -197,11 +197,11 @@ bool checkConvex(vector<Point2f> corners) {
 		float medx = (corners.at(i).x + corners.at(i + 2).x) / 2;
 		float medy = (corners.at(i).y + corners.at(i + 2).y) / 2;
 		if (copysignf(1, medx - corners.at(i + 1).x) == copysignf(1, medx - corners.at((i + 3) % 4).x) // checks if x-velues are on same side of median
-			&& copysignf(1, corners.at(i).y - corners.at(i + 1).y) == copysignf(1, corners.at(i).y - corners.at((i + 3) % 4).y) // checks if y-values are on same side of points
-			&& copysignf(1, corners.at(i + 2).y - corners.at(i + 1).y) == copysignf(1, corners.at(i + 2).y - corners.at((i + 3) % 4).y)
+			&& (copysignf(1, corners.at(i).y - corners.at(i + 1).y) == copysignf(1, corners.at(i).y - corners.at((i + 3) % 4).y) // checks if y-values are on same side of points
+			|| copysignf(1, corners.at(i + 2).y - corners.at(i + 1).y) == copysignf(1, corners.at(i + 2).y - corners.at((i + 3) % 4).y))
 			|| copysignf(1, medy - corners.at(i + 1).y) == copysignf(1, medy - corners.at((i + 3) % 4).y) // checks if y-velues are on same side of median
-			&& copysignf(1, corners.at(i).x - corners.at(i + 1).x) == copysignf(1, corners.at(i).x - corners.at((i + 3) % 4).x) // checks if x-values are on same side of points
-			&& copysignf(1, corners.at(i + 2).x - corners.at(i + 1).x) == copysignf(1, corners.at(i + 2).x - corners.at((i + 3) % 4).x)) {
+			&& (copysignf(1, corners.at(i).x - corners.at(i + 1).x) == copysignf(1, corners.at(i).x - corners.at((i + 3) % 4).x) // checks if x-values are on same side of points
+			|| copysignf(1, corners.at(i + 2).x - corners.at(i + 1).x) == copysignf(1, corners.at(i + 2).x - corners.at((i + 3) % 4).x))) {
 
 			convex = false;
 		}
