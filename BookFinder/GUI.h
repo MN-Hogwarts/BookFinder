@@ -125,12 +125,16 @@ string input() {
 	string name = check();
 	do {
 		if (name != "ERROR") {
-			cv::destroyWindow("Instructions");
-			return name;
+			if (cv::imread(name).data) {
+				cv::destroyWindow("Instructions");
+				return name;
+			}
+			else {
+				name = "ERROR";
+			}
 		}
 		else {
 			name = check();
 		}
 	} while (name == "ERROR");
-		
 }
