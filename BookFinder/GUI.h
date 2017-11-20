@@ -119,14 +119,15 @@ string check() {
 
 string input() {
 	cv::Mat instructions;
-	instructions = cv::imread("Instructions.jpg");
+	instructions = cv::imread("UIOutputs//Instructions.jpg");
 	cv::imshow("Instructions", instructions);
-	cv::waitKey(0);
-	cv::destroyWindow("Instructions");
+	//cv::waitKey(0);
 	string name = check();
 	do {
-		if (name != "ERROR")
+		if (name != "ERROR") {
+			cv::destroyWindow("Instructions");
 			return name;
+		}
 		else {
 			name = check();
 		}

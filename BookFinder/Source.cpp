@@ -21,10 +21,10 @@ bool checkConvex(vector<Point2f>);
 
 int main()
 {
-	imshow("Startup Page", imread("BookOutputs//StartUpPages.jpg"));
+	imshow("BookFinder", imread("UIOutputs//Startup.jpg"));
 	waitKey(500);
 	vector<Books> books = objectvec();
-	destroyWindow("Startup Page");
+	destroyWindow("BookFinder");
 
 	while (1) {
 		string filename = input();
@@ -33,19 +33,20 @@ int main()
 		//imshow("Resized", input.getImage());
 
 		bool found = false;
-		imshow("Searching", imread("BookOutputs//SearchingPage.jpg"));
+		imshow("Searching", imread("UIOutputs//Search.jpg"));
 		waitKey(500);
 		///*
 		for (int i = 0; i < books.size(); i++) {
-			if (findBook(books.at(i), input, true)) {
+			if (findBook(books.at(i), input)) {
 				//destroyWindow("Searching");
+				destroyAllWindows();
 				books.at(i).output();
 				found = true;
 				break;
 			}
 		}
 		if (!found) {
-			imshow("Startup Page", imread("BookOutputs//NotFoundPage.jpg"));
+			imshow("Startup Page", imread("UIOutputs//NotFoundPage.jpg"));
 			waitKey(0);
 		}
 		//*/
@@ -129,6 +130,11 @@ bool findBook(Books cover, Matchable input, bool displayInternal)
 	obj_corners[0] = cvPoint(0, 0); obj_corners[1] = cvPoint(img_object.cols, 0);
 	obj_corners[2] = cvPoint(img_object.cols, img_object.rows); obj_corners[3] = cvPoint(0, img_object.rows);
 	vector<Point2f> scene_corners(4);
+	if (H.rows != H.cols
+		|| H.cols != 3 && H.cols != 4
+		|| H.rows != 3 && H.rows != 4) {
+		return false;
+	}
 	perspectiveTransform(obj_corners, scene_corners, H);
 	/*
 	for (int i = 0; i < scene_corners.size(); i++) {
@@ -136,8 +142,15 @@ bool findBook(Books cover, Matchable input, bool displayInternal)
 	}
 	*/
 	bool validShape = true;
-	for (int i = 0; i < scene_corners.size(); i++) {
+	for (int i = 0; i < scene_corners.size(); i++) { // checks if any points are too close to each other to be a match
 		if (ptsTooClose(scene_corners.at((i + 1) % 4), scene_corners.at(i % 4))) {
+			validShape = false;
+		}
+	}
+	for (int i = 0; i < scene_corners.size(); i++) { // checks if any coordinates are more than 1/3 out of the frams
+		if (scene_corners.at(i).x < 0 - input.getImage().cols / 3 || scene_corners.at(i).y < 0 - input.getImage().rows / 3
+			|| scene_corners.at(i).x > input.getImage().cols + input.getImage().cols / 3
+			|| scene_corners.at(i).y > input.getImage().rows + input.getImage().rows / 3) {
 			validShape = false;
 		}
 	}
@@ -150,7 +163,7 @@ bool findBook(Books cover, Matchable input, bool displayInternal)
 	if (!checkConvex(scene_corners)) {
 		validShape = false;
 	}
-	if (displayInternal && validShape) {
+	if (displayInternal){// && validShape) {
 		Mat img_matches;
 		drawMatches(img_object, keypoints_object, img_scene, keypoints_scene,
 		//drawMatches(img_object, keypoints_object, resized, keypoints_scene,
