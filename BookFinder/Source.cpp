@@ -33,6 +33,11 @@ int main()
 				books.at(i).output();
 				break;
 			}
+			else if (i == (books.size() - 1)) {
+				Mat notFound = imread("BookOutputs\\NotFoundPage.jpg");
+				imshow("Book not found", notFound);
+				cv::waitKey(0);
+			}
 		}
 		destroyAllWindows();
 	}
