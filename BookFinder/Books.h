@@ -2,8 +2,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <Windows.h>
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
+
 using namespace std;
 //using namespace cv;
 
@@ -62,8 +64,30 @@ Matchable::Matchable(cv::Mat input) {
 	if (!img.data) {
 		cout << " --(!) Error reading images " << endl; return;
 	}
+	
+	GetSystemMetrics(SM_CXSCREEN);
+	/*
+	HWND hWnd = GetDesktopWindow(); // Get screen resolution
+	HMONITOR monitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+	MONITORINFO info;
+	info.cbSize = sizeof(MONITORINFO);
+	GetMonitorInfo(monitor, &info);
+	*/
+	int monitor_width = GetSystemMetrics(SM_CXSCREEN); //info.rcMonitor.right - info.rcMonitor.left;
+	int monitor_height = GetSystemMetrics(SM_CYSCREEN); //info.rcMonitor.bottom - info.rcMonitor.top;
+	
+	float widthMultiplier = (float)(monitor_width) / img.cols;
+	float heightMultiplier = (float)(monitor_height) / img.rows;
 
-	cv::Size newSize(input.cols * .3, input.rows * .3);
+	float multiplier = 1;
+	if (widthMultiplier < 1 && widthMultiplier < heightMultiplier) {
+		multiplier = widthMultiplier;
+	}
+	else if (heightMultiplier < 1) {
+		multiplier = heightMultiplier;
+	}
+
+	cv::Size newSize(input.cols * multiplier, input.rows * multiplier);
 	cv::resize(input, img, newSize);
 
 	cv::Mat blackWhite;
