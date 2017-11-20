@@ -38,7 +38,7 @@ int main()
 		///*
 		for (int i = 0; i < books.size(); i++) {
 			if (findBook(books.at(i), input, true)) {
-				destroyWindow("Searching");
+				//destroyWindow("Searching");
 				books.at(i).output();
 				found = true;
 				break;
@@ -162,6 +162,7 @@ bool findBook(Books cover, Matchable input, bool displayInternal)
 		line(img_matches, scene_corners[2] + Point2f(img_object.cols, 0), scene_corners[3] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
 		line(img_matches, scene_corners[3] + Point2f(img_object.cols, 0), scene_corners[0] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
 		//-- Show detected matches
+		destroyAllWindows();
 		namedWindow("Good Matches & Object detection", WINDOW_AUTOSIZE);
 		imshow("Good Matches & Object detection", img_matches);
 		waitKey(0);
