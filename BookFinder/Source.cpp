@@ -43,6 +43,11 @@ int main()
 				found = true;
 				break;
 			}
+			else if (i == (books.size() - 1)) {
+				Mat notFound = imread("BookOutputs\\NotFoundPage.jpg");
+				imshow("Book not found", notFound);
+				cv::waitKey(0);
+			}
 		}
 		if (!found) {
 			imshow("Startup Page", imread("BookOutputs//NotFoundPage.jpg"));
