@@ -46,7 +46,8 @@ int main()
 			}
 		}
 		if (!found) {
-			imshow("Startup Page", imread("UIOutputs//NotFoundPage.jpg"));
+			destroyAllWindows();
+			imshow("Not found!", imread("UIOutputs//NotFoundPage.jpg"));
 			waitKey(0);
 		}
 		//*/
